@@ -1,0 +1,6 @@
+mvn clean - clean mess
+mvn test - run tests
+mvn compile - compile the source code
+mvn package - build JAR file
+
+
