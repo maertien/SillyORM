@@ -13,4 +13,13 @@ public interface IConfiguration {
 	 * @return The database file path
 	 */
 	public String getDBFile();
+	
+	/**
+	 * Default implementation of exception handler
+	 * 
+	 * @param e The exception to be handled
+	 */
+	public default void handleError(Exception e) {
+		e.printStackTrace();
+	}
 }

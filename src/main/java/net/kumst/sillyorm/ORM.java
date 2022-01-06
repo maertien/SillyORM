@@ -1,7 +1,9 @@
 package net.kumst.sillyorm;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,8 +40,8 @@ public class ORM {
 			PreparedStatement statement = Connector.getInstance().getConnection(jConfiguration).prepareStatement(sql);
 			statement.executeUpdate();
 		}
-		catch (Exception e) {
-			// We do not care, we are silly
+		catch (SQLException e) {
+			handleException(e);
 		}
 	}
 	
@@ -119,8 +121,8 @@ public class ORM {
 			}
 			return result;
 		}
-		catch (Exception e) {
-			// We do not care, we are silly
+		catch (SQLException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+			handleException(e);
 		}
 		return null;
 	}
@@ -162,9 +164,8 @@ public class ORM {
 						reflection.setValue("id", newId);
 					}
 				}
-			} catch (Exception e) {
-				// We do not care, we are silly
-				System.out.println(e);
+			} catch (SQLException e) {
+				handleException(e);
 			}
 		}
 	}
@@ -185,8 +186,8 @@ public class ORM {
 				statement.setInt(1, Integer.parseInt(id));
 				statement.executeUpdate();
 			}
-			catch (Exception e) {
-				// We do not care, we are silly
+			catch (SQLException e) {
+				handleException(e);
 			}
 		}
 	}
@@ -198,8 +199,8 @@ public class ORM {
 		try {
 			Connector.getInstance().getConnection(jConfiguration).setAutoCommit(false);
 		}
-		catch (Exception e) {
-			// We do not care, we are silly
+		catch (SQLException e) {
+			handleException(e);
 		}
 	}
 	
@@ -210,8 +211,8 @@ public class ORM {
 		try {
 			Connector.getInstance().getConnection(jConfiguration).commit();
 		} 
-		catch (Exception e) {
-			// We do not care, we are silly
+		catch (SQLException e) {
+			handleException(e);
 		}
 	}
 	
@@ -222,8 +223,8 @@ public class ORM {
 		try {
 			Connector.getInstance().getConnection(jConfiguration).rollback();
 		}
-		catch (Exception e) {
-			// We do not care, we are silly
+		catch (SQLException e) {
+			handleException(e);
 		}
 	}
 	
@@ -234,8 +235,12 @@ public class ORM {
 		try {
 			Connector.getInstance().getConnection(jConfiguration).setAutoCommit(true);
 		}
-		catch (Exception e) {
-			// We do not care, we are silly
+		catch (SQLException e) {
+			handleException(e);
 		}
+	}
+	
+	private void handleException(Exception e) {
+		jConfiguration.handleError(e);
 	}
 }
