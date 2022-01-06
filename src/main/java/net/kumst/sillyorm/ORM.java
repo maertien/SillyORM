@@ -190,4 +190,52 @@ public class ORM {
 			}
 		}
 	}
+	
+	/**
+	 * Begins the transaction
+	 */
+	public void beginTransaction() {
+		try {
+			Connector.getInstance().getConnection(jConfiguration).setAutoCommit(false);
+		}
+		catch (Exception e) {
+			// We do not care, we are silly
+		}
+	}
+	
+	/**
+	 * Commits the transaction
+	 */
+	public void commitTransaction() {
+		try {
+			Connector.getInstance().getConnection(jConfiguration).commit();
+		} 
+		catch (Exception e) {
+			// We do not care, we are silly
+		}
+	}
+	
+	/**
+	 * Rollbacks the transaction
+	 */
+	public void rollbackTransaction() {
+		try {
+			Connector.getInstance().getConnection(jConfiguration).rollback();
+		}
+		catch (Exception e) {
+			// We do not care, we are silly
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public void endTransactionMode() {
+		try {
+			Connector.getInstance().getConnection(jConfiguration).setAutoCommit(true);
+		}
+		catch (Exception e) {
+			// We do not care, we are silly
+		}
+	}
 }

@@ -148,4 +148,37 @@ public class TestORM {
 		orm.delete(stored);
 		assertNull(orm.find(TestEntity.class, 1));
 	}
+	
+	@Test
+	public void testTransaction() {
+		orm.beginTransaction();
+		TestEntity test = new TestEntity();
+		test.setName("Name");
+		test.setValue("Value");
+		orm.save(test);
+		TestEntity test2 = new TestEntity();
+		test2.setName("Name");
+		test2.setValue("Value");
+		orm.save(test2);
+		orm.commitTransaction();
+		assertEquals("2", test2.getId());
+		orm.endTransactionMode();
+		
+		orm.beginTransaction();
+		TestEntity test3 = new TestEntity();
+		test3.setName("Name");
+		test3.setValue("Value");
+		orm.save(test3);
+		assertEquals("3", test3.getId());
+		orm.rollbackTransaction();
+		
+		orm.beginTransaction();
+		TestEntity test4 = new TestEntity();
+		test4.setName("Name");
+		test4.setValue("Value");
+		orm.save(test4);
+		orm.commitTransaction();
+		assertEquals("3", test4.getId());
+		orm.endTransactionMode();
+	}
 }
