@@ -1,6 +1,9 @@
+SillyORM
+
+The as simple as possible ORM for SQLite.
+
 mvn clean - clean mess
 mvn test - run tests
 mvn compile - compile the source code
 mvn package - build JAR file
-
 

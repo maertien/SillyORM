@@ -2,6 +2,7 @@ package net.kumst.sillyorm;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -49,33 +50,78 @@ public class ORM {
 	 * @param id The id of object 
 	 * @return The object with the given id or null
 	 */
-	public Object find(Class<?> entityClass, int id) {
+	public <T> T find(Class<T> entityClass, int id) {
 		SQLGenerator gen = new SQLGenerator(new Reflection(entityClass));
 		String sql = gen.generateSelect();
-		try {
-			PreparedStatement statement = Connector.getInstance().getConnection(jConfiguration).prepareStatement(sql);
-			statement.setInt(1, id);
-			ResultSet rs = statement.executeQuery();
-			if (rs.next()) {
-				Object result = entityClass.getDeclaredConstructor().newInstance();
-				Reflection reflector = new Reflection(result);
-				for (String varName : reflector.getAllVariables()) {
-					reflector.setValue(varName, rs.getString(varName));
-				}
-				reflector.setValue("id", rs.getString("id"));
-				return result;
-			}
-		}
-		catch (Exception e) {
-			// We do not care, we are silly
+		List<T> result = find(entityClass, sql, id);
+		if (result.size() == 1) {
+			return result.get(0);
 		}
 		return null;
 	}
 	
-	public List<Object> find(Class<?> entityClass, Criteria ... criterias) {
+	/**
+	 * Returns the list of objects fulfill given criterias
+	 * 
+	 * @param <T> The type of entity
+	 * @param entityClass The entity class
+	 * @param criterias Criterias to meet
+	 * @return The list of objects
+	 */
+	public <T> List<T> find(Class<T> entityClass, Criteria ... criterias) {
 		SQLGenerator gen = new SQLGenerator(new Reflection(entityClass));
-		gen.generateSelect(Arrays.asList(criterias));
+		String sql = gen.generateSelect(Arrays.asList(criterias));
 		
+		List<Object> args = new ArrayList<>();
+		for (Criteria c : criterias) {
+			if (!c.isOperator()) {
+				args.add(c.getVariableValue());
+			}
+		}
+		
+		return find(entityClass, sql, args.toArray()); 
+	}
+	
+	/**
+	 * Returns the of objects got by sql command
+	 * 
+	 * @param <T> The type of entity
+	 * @param entityClass The entity class
+	 * @param sql The SQL command to select the objects
+	 * @param args The arguments bound to DB statement
+	 * @return The list of objects
+	 */
+	public <T> List<T> find(Class<T> entityClass, String sql, Object ... args) {
+		try {
+			PreparedStatement statement = Connector.getInstance().getConnection(jConfiguration).prepareStatement(sql);
+			
+			int i = 1;
+			for (Object arg : args) {
+				if (arg instanceof Integer) {
+					statement.setInt(i, (int) arg);
+				}
+				else {
+					statement.setString(i, (String) arg);
+				}
+				i++;
+			}
+			
+			ResultSet rs = statement.executeQuery();
+			List<T> result = new ArrayList<>();
+			while (rs.next()) {
+				T obj = entityClass.getDeclaredConstructor().newInstance();
+				Reflection reflector = new Reflection(obj);
+				for (String varName : reflector.getAllVariables()) {
+					reflector.setValue(varName, rs.getString(varName));
+				}
+				reflector.setValue("id", rs.getString("id"));
+				result.add(obj);
+			}
+			return result;
+		}
+		catch (Exception e) {
+			// We do not care, we are silly
+		}
 		return null;
 	}
 	
