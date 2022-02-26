@@ -62,7 +62,7 @@ public class SQLGenerator {
 		result.append(") VALUES (null, ");
 		
 		List<String> qs = new ArrayList<>();
-		for (String var : vars) {
+		for (int i = 0; i < vars.size(); i++) {
 			qs.add("?");
 		}
 		result.append(String.join(", ", qs));

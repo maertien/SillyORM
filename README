@@ -1,6 +1,6 @@
 SillyORM
 
-The as simple as possible ORM for SQLite.
+The 'as simple as possible' ORM for SQLite.
 
 mvn clean - clean mess
 mvn test - run tests

@@ -13,7 +13,7 @@ import java.util.List;
 public class Reflection {
 	
 	private Object jReflectedObject;
-	private Class jReflectedClass;
+	private Class<?> jReflectedClass;
 	
 	/**
 	 * Construct Reflection
@@ -33,7 +33,7 @@ public class Reflection {
 	 * 
 	 * @param reflectedClass The class to be reflected
 	 */
-	public Reflection(Class reflectedClass) {
+	public Reflection(Class<?> reflectedClass) {
 		jReflectedClass = reflectedClass;
 	}
 	
@@ -74,7 +74,7 @@ public class Reflection {
 	 */
 	public String getValue(String varName) {
 		try {
-			Method method = jReflectedClass.getMethod("get" + firstLetterToUpperCase(varName), null);
+			Method method = jReflectedClass.getMethod("get" + firstLetterToUpperCase(varName), (Class<?>[]) null);
 			Object value = method.invoke(jReflectedObject);
 			return value == null ? null : value.toString();
 		}
